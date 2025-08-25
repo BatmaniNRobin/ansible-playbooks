@@ -29,11 +29,10 @@ module "eks" {
 module "eks_managed_node_group" {
   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
 
-  name            = "separate-eks-mng"
+  name            = "mani-eks-mng"
   cluster_name    = var.cluster_name
-  cluster_version = var.cluster_version
 
-  subnet_ids = ["subnet-abcde012", "subnet-bcde012a", "subnet-fghi345a"]
+  subnet_ids = module.vpc.private_subnets
 
   // The following variables are necessary if you decide to use the module outside of the parent EKS module context.
   // Without it, the security groups of the nodes are empty and thus won't join the cluster.
@@ -55,14 +54,8 @@ module "eks_managed_node_group" {
   max_size     = 10
   desired_size = 1
 
-  instance_types = ["t3.large"]
+  instance_types = ["t2.micro"]
   capacity_type  = "SPOT"
-
-  labels = {
-    Environment = "test"
-    GithubRepo  = "terraform-aws-eks"
-    GithubOrg   = "terraform-aws-modules"
-  }
 
   taints = {
     dedicated = {
@@ -76,4 +69,11 @@ module "eks_managed_node_group" {
     Environment = "dev"
     Terraform   = "true"
   }
+}
+
+data "aws_eks_cluster" "cluster" {
+    name = module.eks.cluster_id
+}
+data "aws_eks_cluster_auth" "cluster" {
+    name = module.eks.cluster_id
 }

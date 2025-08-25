@@ -15,4 +15,12 @@ module "vpc" {
     Terraform = "true"
     Environment = "dev"
   }
+
+  public_subnet_tags = {
+    "Name" = "mani-Public-Subnet"
+  }
+  
+  private_subnet_tags = {
+    "Name" = "mani-Private-Subnet"
+  }
 }
